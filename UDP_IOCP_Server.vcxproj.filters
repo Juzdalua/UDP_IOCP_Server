@@ -13,6 +13,9 @@
     <Filter Include="Server">
       <UniqueIdentifier>{fca07542-acda-472d-bb71-80034cb1ffd7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Packet">
+      <UniqueIdentifier>{ccff2c5e-728c-40af-a1db-62b58d162a4a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UDP_IOCP_Server.cpp">
@@ -21,13 +24,26 @@
     <ClCompile Include="Utils.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="ServerCore.cpp" />
+    <ClCompile Include="ServerCore.cpp">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessPacket.cpp">
+      <Filter>Packet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Utils.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="ServerCore.h" />
+    <ClInclude Include="ServerCore.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketInfo.h">
+      <Filter>Packet</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessPacket.h">
+      <Filter>Packet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore">

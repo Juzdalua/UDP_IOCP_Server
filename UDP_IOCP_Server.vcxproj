@@ -105,6 +105,8 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,11 +131,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ProcessPacket.cpp" />
     <ClCompile Include="ServerCore.cpp" />
     <ClCompile Include="UDP_IOCP_Server.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="PacketInfo.h" />
+    <ClInclude Include="ProcessPacket.h" />
     <ClInclude Include="ServerCore.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>

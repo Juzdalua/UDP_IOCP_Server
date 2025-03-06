@@ -1,9 +1,11 @@
 ﻿#include <iostream>
 #include "Utils.h"
 #include "ServerCore.h"
+#include "PacketInfo.h"
 
 int main()
 {
+
     Utils::EnvInit();
     std::string SERVER_IP = Utils::getEnv("SERVER_IP");
     int SERVER_PORT = stoi(Utils::getEnv("SERVER_PORT"));
@@ -20,8 +22,6 @@ int main()
     std::cout << '\n';
 
     server.startServer();
-
-
 
     server.stopServer();
     return 0;

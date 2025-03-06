@@ -10,6 +10,9 @@
 #include <WS2tcpip.h>
 #include <string>
 
+#include "ProcessPacket.h"
+#include "PacketInfo.h"
+
 #pragma comment(lib, "ws2_32.lib")
 
 constexpr int BUFFER_SIZE = 512;
@@ -113,7 +116,14 @@ private:
 		DWORD flags = 0;
 		DWORD recvBytes = 0;
 
-		WSARecvFrom(_udpSocket, &perIoData->wsaBuf, 1, &recvBytes, &flags, (sockaddr*)&perIoData->clientAddr, &perIoData->addrLen, &perIoData->overlapped, nullptr);
+		int result = WSARecvFrom(_udpSocket, &perIoData->wsaBuf, 1, &recvBytes, &flags, (sockaddr*)&perIoData->clientAddr, &perIoData->addrLen, &perIoData->overlapped, nullptr);
+		if (result == SOCKET_ERROR) {
+			int errorCode = WSAGetLastError();
+			if (errorCode != WSA_IO_PENDING)
+			{
+				std::cerr << "WSARecvFrom failed. Error: " << WSAGetLastError() << std::endl;
+			}
+		}
 	}
 
 	void recvWorkerThread() {
@@ -129,25 +139,47 @@ private:
 				continue;
 			}
 
-			// 받은 데이터의 끝에 NULL을 추가하여 문자열로 처리
-			if (bytesTransferred < BUFFER_SIZE) {
-				perIoData->buffer[bytesTransferred] = '\0'; // 널 종료 문자 추가
+			std::cout << '\n';
+			std::cout << "Received packet from client: " << perIoData->clientAddr.sin_addr.s_addr << std::endl;
+
+			// 수신된 데이터 처리
+			static std::vector<unsigned char> recvBuffer;
+			recvBuffer.insert(recvBuffer.end(), perIoData->buffer, perIoData->buffer + bytesTransferred);
+
+			// 첫 5바이트 헤더를 분석
+			while (recvBuffer.size() >= 5) {
+				unsigned short sNetVersion = *reinterpret_cast<const unsigned short*>(&recvBuffer[0]);
+				short sMask = *reinterpret_cast<const short*>(&recvBuffer[2]);
+				unsigned char bSize = recvBuffer[4];
+
+				std::cout << "bytesTransferred: " << bytesTransferred << '\n';
+				std::cout << "Received Header - NetVersion: " << sNetVersion
+					<< ", Mask: " << sMask
+					<< ", bSize: " << (int)bSize << std::endl;
+
+				// 실제 데이터 크기 계산: bSize - 5
+				size_t dataSize = bSize - 5;
+
+				// 전체 패킷이 완전히 수신되었는지 확인
+				if (recvBuffer.size() < bSize) {
+					std::cout << "Packet not complete yet. Waiting for more data." << std::endl;
+					break; // 패킷이 완전히 수신되지 않으면, 다음 데이터 수신을 기다림
+				}
+
+
+				// 패킷 처리
+				ProcessPacket::handlePacket(recvBuffer.data());
+
+				// 처리된 패킷 제거
+				recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + bSize); // 전체 패킷 제거
 			}
-			else {
-				perIoData->buffer[BUFFER_SIZE - 1] = '\0'; // 만약 크기가 버퍼를 초과하면 마지막에 NULL 추가
-			}
 
-			std::cout << "Received from client: " << perIoData->buffer << std::endl;
-
-			// 받은 데이터를 에코로 송신 (예시)
-			 send(perIoData->clientAddr, perIoData->buffer, bytesTransferred);
-
+			// 다음 수신 준비
 			ZeroMemory(&perIoData->overlapped, sizeof(WSAOVERLAPPED));
 			postRecv();
 			delete perIoData;
 		}
 	}
-
 
 	void sendWorkerThread() {
 		// 송신 작업을 처리하는 스레드 로직을 작성할 수 있습니다.
