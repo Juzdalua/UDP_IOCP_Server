@@ -14,6 +14,7 @@
 
 constexpr int BUFFER_SIZE = 512;
 constexpr int MAX_CLIENTS = 5;
+constexpr int RECV_THREAD_SIZE = 5;
 
 struct PerIoData {
 	WSAOVERLAPPED overlapped = {};
@@ -62,7 +63,9 @@ public:
 	}
 
 	void runThread() {
-		_threads.push_back(std::thread(&ServerCore::recvWorkerThread, this));
+		for (int i = 0; i < RECV_THREAD_SIZE; ++i) {
+			_threads.push_back(std::thread(&ServerCore::recvWorkerThread, this));
+		}
 		_threads.push_back(std::thread(&ServerCore::sendWorkerThread, this));
 	}
 
@@ -137,7 +140,7 @@ private:
 			std::cout << "Received from client: " << perIoData->buffer << std::endl;
 
 			// 받은 데이터를 에코로 송신 (예시)
-			// send(perIoData->clientAddr, perIoData->buffer, bytesTransferred);
+			 send(perIoData->clientAddr, perIoData->buffer, bytesTransferred);
 
 			ZeroMemory(&perIoData->overlapped, sizeof(WSAOVERLAPPED));
 			postRecv();
