@@ -3,7 +3,7 @@
 #include <iostream>
 #include "PacketInfo.h"
 
-void ProcessPacket::handlePacket(const unsigned char* buffer)
+void ProcessPacket::handlePacket(const unsigned char* buffer, int bytesTransferred)
 {
 	// 헤더 파싱
 	unsigned short sNetVersion = *reinterpret_cast<const unsigned short*>(buffer); // 2바이트

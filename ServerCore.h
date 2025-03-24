@@ -166,9 +166,8 @@ private:
 					break; // 패킷이 완전히 수신되지 않으면, 다음 데이터 수신을 기다림
 				}
 
-
 				// 패킷 처리
-				ProcessPacket::handlePacket(recvBuffer.data());
+				ProcessPacket::handlePacket(recvBuffer.data(), bytesTransferred);
 
 				// 처리된 패킷 제거
 				recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + bSize); // 전체 패킷 제거
@@ -194,4 +193,5 @@ private:
 	HANDLE _iocp;
 	SOCKET _udpSocket;
 	std::vector<std::thread> _threads;
+	std::map<int, sockaddr_in> _clients;
 };

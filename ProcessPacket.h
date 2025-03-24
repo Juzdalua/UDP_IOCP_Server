@@ -2,7 +2,7 @@
 class ProcessPacket
 {
 public:
-	static void handlePacket(const unsigned char* buffer);
+	static void handlePacket(const unsigned char* buffer, int bytesTransferred);
 
 public:
 	// sMask = 1
